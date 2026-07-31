@@ -9,10 +9,12 @@ jobs:
   run-bot:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # Bu yetkinin tanımlı olması şart
     steps:
       - name: Repoyu Klonla
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true # Git push için gerekli
 
       - name: Python Kur
         uses: actions/setup-python@v5
@@ -31,7 +33,13 @@ jobs:
 
       - name: Degisiklikleri Github'a Yukle
         run: |
-          git config --global user.name 'ResmiGazeteBot'
-          git config --global user.email 'bot@resmigazeteozet.local'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add data.js
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Gunluk otomatik guncelleme: data.js" && git push)
+          # Eğer değişiklik varsa commit at
+          if ! git diff --cached --quiet; then
+            git commit -m "Otomatik guncelleme: data.js"
+            git push
+          else
+            echo "Değişiklik yok, commit atılmadı."
+          fi
