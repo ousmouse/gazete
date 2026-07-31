@@ -1,43 +1,42 @@
 name: Günlük Resmi Gazete Botu
 
 on:
-  schedule:
-    # Her gün Türkiye saati ile sabaha karşı 04:00 (UTC 01:00) çalışır.
-    - cron: '0 1 * * *'
-  
-  # Botu istediğiniz zaman manuel başlatabilmeniz için gereken komut.
-  workflow_dispatch:
+schedule:
+- cron: '0 1 * * *'
+
+workflow_dispatch:
 
 jobs:
-  run-bot:
-    runs-on: ubuntu-latest
-    
-    permissions:
-      contents: write
+run-bot:
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Repoyu Klonla
-        uses: actions/checkout@v3
+permissions:
+  contents: write
 
-      - name: Python Kur
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
+steps:
+  - name: Repoyu Klonla
+    # Versiyon v4 olarak güncellendi (Uyarıyı çözer)
+    uses: actions/checkout@v4
 
-      - name: Kütüphaneleri Yükle
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 PyPDF2 google-generativeai
+  - name: Python Kur
+    # Versiyon v5 olarak güncellendi (Uyarıyı çözer)
+    uses: actions/setup-python@v5
+    with:
+      python-version: '3.10'
 
-      - name: Botu Çalıştır
-        env:
-          # Botunuz şifreyi, 1. Adımda kurduğumuz kasadan (secrets) çekecek.
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python resmi_gazete_bot.py
+  - name: Kütüphaneleri Yükle
+    run: |
+      python -m pip install --upgrade pip
+      pip install requests beautifulsoup4 PyPDF2 google-generativeai
 
-      - name: Değişiklikleri Github'a Yükle (Commit & Push)
-        run: |
-          git config --global user.name 'ResmiGazeteBot'
-          git config --global user.email 'bot@resmigazeteozet.local'
-          git add data.js
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Günlük otomatik güncelleme: data.js" && git push)
+  - name: Botu Çalıştır
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    run: python resmi_gazete_bot.py
+
+  - name: Değişiklikleri Github'a Yükle (Commit & Push)
+    run: |
+      git config --global user.name 'ResmiGazeteBot'
+      git config --global user.email 'bot@resmigazeteozet.local'
+      git add data.js
+      git diff --quiet && git diff --staged --quiet || (git commit -m "Günlük otomatik güncelleme: data.js" && git push)
