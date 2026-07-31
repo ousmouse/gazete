@@ -26,7 +26,6 @@ def get_pdf_text(pdf_url):
     return None
 
 def main():
-    # Bugünkü tarih
     url = f"https://www.resmigazete.gov.tr/eskiler/{datetime.now().strftime('%Y/%m/%d')}/{datetime.now().strftime('%Y%m%d')}.pdf"
     print(f"Hedef URL: {url}")
     
@@ -37,17 +36,17 @@ def main():
         prompt = "Resmi gazete metnini incele ve en önemli 3 kararı JSON listesi olarak ver. SADECE JSON. Keys: title, category, summary, impact, emoji, color."
         response = model.generate_content(prompt + text[:4000])
         
+        # Temizleme işlemini tek satıra aldık
         json_str = response.text.replace("
 ```json", "").replace("```", "").strip()
         
-        # Dosyaya yazma
         output_content = f"const mockData = {json_str};"
         with open("data.js", "w", encoding="utf-8") as f:
             f.write(output_content)
         
-        print("data.js dosyası oluşturuldu/güncellendi.")
+        print("data.js başarıyla yazıldı.")
     else:
-        print("Bot başarısız: Metin bulunamadı.")
+        print("Bot başarısız: PDF içeriği alınamadı.")
 
 if __name__ == "__main__":
     main()
