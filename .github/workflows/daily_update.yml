@@ -1,13 +1,23 @@
+name: Günlük Resmi Gazete Botu
+
+on:
+schedule:
+- cron: '0 1 * * *'
+
+workflow_dispatch:
+
+jobs:
+run-bot:
+runs-on: ubuntu-latest
+
 permissions:
   contents: write
 
 steps:
   - name: Repoyu Klonla
-    # Versiyon v4 olarak güncellendi (Uyarıyı çözer)
     uses: actions/checkout@v4
 
   - name: Python Kur
-    # Versiyon v5 olarak güncellendi (Uyarıyı çözer)
     uses: actions/setup-python@v5
     with:
       python-version: '3.10'
